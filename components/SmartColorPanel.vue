@@ -1,62 +1,123 @@
 <template>
   <div class="smart-color">
     <div class="container">
-      <v-card title="Image" class="section">
-        <img width="300" height="300" :src="imageSrc">
+      <v-card class="section">
+        <v-card-item>
+          <v-img width="300" height="300" :src="(imageSrc.length) ? imageSrc : 'error'">
+            <template v-slot:error>
+              <div>Error Loading Image, Try Again</div>
+              <v-img class="mx-auto" height="300" width="500"
+                src="https://images.unsplash.com/photo-1526297003708-f5a1c2c9c6e7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2370&q=80"></v-img>
+              {{ imgErr = true }}
+            </template>
+          </v-img>
+        </v-card-item>
+
+        <v-card-actions class="flex justify-space-evenly">
+          <v-text-field variant="outlined" density="compact" hide-details :error="imgErr" v-model="inputValue" clearable
+            label="Image Url" />
+
+          <v-btn class="ml-2" variant="outlined" density="compact" @click="updateSource">use image</v-btn>
+        </v-card-actions>
+        <a target="_blank" href="https://unsplash.com/s/photos/random"> Click Here for Photos to Test</a>
       </v-card>
 
-      <v-card class="section image" v-if="colorProperties">
-        <h4>Colors</h4>
+      <v-card class="section" v-if="colorProperties" title="Color Properties">
         <div v-if="dominantColor" class="dominant">
           <h5> Dominant <br /> {{ dominantColor }} </h5>
           <div v-bind:style="{ 'background-color': dominantColor }" class=" color-display" />
         </div>
 
+
         <h5 v-if="colorProperties"> Color Properties </h5>
-        <div class="properties" v-for="color  in  colorProperties">{{ color }}
-          <div v-bind:style="{ 'background-color': color }" class=" color-display" />
+        <div class="color-bars lg">
+          <v-tooltip location="center" v-for="color in colorProperties" :key="color" :text="color">
+            <template v-slot:activator="{ props }">
+              <div v-bind="props" :style="{ backgroundColor: color }"></div>
+            </template>
+          </v-tooltip>
         </div>
       </v-card>
 
-      <v-card class="section" v-if="textColors && bgColors && borderColors">
-        <h4>Recommendations</h4>
-        <div v-if="textColors && bgColors && borderColors">
-          <h5>Text Recommendations</h5>
-          <div class="properties" v-for="color  in  textColors">{{ color.color }}
-            <div v-bind:style="{ 'background-color': color.color }" class=" color-display" />
-          </div>
-          <v-divider></v-divider>
-          <h5>Background Recommendations</h5>
-          <div class="properties" v-for="color  in  bgColors">{{ color.color }}
-            <div v-bind:style="{ 'background-color': color.color }" class=" color-display" />
-          </div>
-          <v-divider></v-divider>
-          <h5>Border Recommendations</h5>
-          <div class="properties" v-for=" color  in  borderColors">{{ color.color }}
-            <div v-bind:style="{ 'background-color': color.color }" class=" color-display" />
-          </div>
-          <v-divider></v-divider>
-          <h5>Shadow Recommendations</h5>
-          <div class="properties" v-for=" color  in  shadowColors">{{ color.color }}
-            <div v-bind:style="{ 'background-color': color.color }" class=" color-display" />
-          </div>
-        </div>
+      <v-card class="section" v-if="textColors && bgColors && borderColors || loading" :loading="loading"
+        title="Recommendations">
+        <v-card-item v-if="textColors && bgColors && borderColors || loading" :loading="loading">
+          <v-card-item>
+            <h5>Text Recommendations</h5>
+            <div class="color-bars">
+              <v-tooltip location="center" class="properties" v-for="{ color, accessible }  in  textColors" :key="color"
+                :text="color">
+                <template v-slot:activator="{ props }">
+                  <div v-bind="props" :style="{ backgroundColor: color }" @mouseenter="() => isAssesible = accessible"
+                    @mouseout="() => isAssesible = ''"></div>
+                </template>
+              </v-tooltip>
+            </div>
+          </v-card-item>
 
+          <v-divider></v-divider>
+
+          <v-card-item>
+            <h5>Background Recommendations</h5>
+
+            <div class="color-bars">
+              <v-tooltip location="center" class="properties" v-for="{ color, accessible }  in  bgColors" :key="color"
+                :text="color">
+                <template v-slot:activator="{ props }">
+                  <div v-bind="props" :style="{ backgroundColor: color }" @mouseenter="() => isAssesible = accessible"
+                    @mouseout="() => isAssesible = ''"></div>
+                </template>
+              </v-tooltip>
+            </div>
+          </v-card-item>
+
+          <v-divider></v-divider>
+
+          <v-card-item>
+            <h5>Border Recommendations</h5>
+
+            <div class="color-bars">
+              <v-tooltip location="center" class="properties" v-for="{ color, accessible }  in  borderColors" :key="color"
+                :text="color">
+                <template v-slot:activator="{ props }">
+                  <div v-bind="props" :style="{ backgroundColor: color }" @mouseenter="() => isAssesible = accessible"
+                    @mouseout="() => isAssesible = ''"></div>
+                </template>
+              </v-tooltip>
+            </div>
+          </v-card-item>
+
+          <v-divider></v-divider>
+
+          <v-card-item>
+            <h5>Shadow Recommendations</h5>
+
+            <div class="color-bars">
+              <v-tooltip location="center" class="properties" v-for="{ color, accessible }  in  shadowColors" :key="color"
+                :text="color">
+                <template v-slot:activator="{ props }">
+                  <div v-bind="props" :style="{ backgroundColor: color }" @mouseenter="() => isAssesible = accessible"
+                    @mouseout="() => isAssesible = ''"></div>
+                </template>
+              </v-tooltip>
+            </div>
+          </v-card-item>
+        </v-card-item>
+
+        <h5 v-if="isAssesible !== ''"> Color is Accessible : {{ `${isAssesible}`.charAt(0).toUpperCase()
+          + `${isAssesible}`.slice(1) }}</h5>
       </v-card>
     </div>
-    <div v-if="loading" class="lds-facebook">
-      <div></div>
-      <div></div>
-      <div></div>
-    </div>
-    <pre>{{ recommendation }}</pre>
-    <v-btn variant="outlined" class="generate-action" @click="getColorProperties">Generate Recommendations</v-btn>
+    <v-btn variant="outlined" class="generate-action" :disabled="!imageSrc.length" @click="getColorProperties">Generate
+      Recommendations</v-btn>
   </div>
 </template>
 
 
 <script setup>
-const imageSrc = ref("https://d181ynnxrxn8wz.cloudfront.net/MilliePhilipProfile.png");
+
+const imageSrc = ref("https://images.unsplash.com/photo-1464820453369-31d2c0b651af?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y29sb3JmdWx8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=700&q=60");
+const inputValue = ref('')
 const colorProperties = ref('')
 const dominantColor = ref('')
 const textColors = ref('')
@@ -64,11 +125,31 @@ const bgColors = ref('')
 const borderColors = ref('')
 const shadowColors = ref('')
 const loading = ref(false)
+const imgErr = ref(false)
+const isAssesible = ref('')
+
+const resetValues = () => {
+  colorProperties.value = ''
+  dominantColor.value = ''
+  textColors.value = ''
+  bgColors.value = ''
+  borderColors.value = ''
+  shadowColors.value = ''
+}
+
+const updateSource = () => {
+  // check url
+  imageSrc.value = inputValue.value; //'https://d24xn8jvo7q7oc.cloudfront.net/profile500.png'
+  resetValues()
+  imgErr.vale = false
+}
 
 const rgbToHex = (r, g, b) => '#' + [r, g, b].map(x => {
   const hex = x.toString(16)
   return hex.length === 1 ? '0' + hex : hex
 }).join('')
+
+
 
 const getColorProperties = async () => {
   const { data } = await useFetch('/api/extractColor', {
@@ -104,7 +185,9 @@ const getGbtRecommendations = async () => {
 
 
 watch([dominantColor], async () => {
-  await getGbtRecommendations()
+  if (dominantColor.value) {
+    await getGbtRecommendations()
+  }
 })
 
 onMounted(() => {
@@ -132,16 +215,28 @@ onMounted(() => {
   padding: 16px;
   min-width: 300px;
   min-height: 400px;
-
-  h4 {
-    font-size: 24px;
-    margin: 0px;
-  }
+  overflow: hidden !important;
+  text-align: center;
 }
 
 .image {
   height: 25em;
   width: 25em;
+}
+
+.color-bars {
+  display: flex;
+  flex-direction: row;
+  height: 2em;
+  border: solid black 0.5px;
+
+  div {
+    width: 2em;
+  }
+}
+
+.lg {
+  height: 10em;
 }
 
 .color-display {
@@ -176,50 +271,5 @@ onMounted(() => {
 
 .generate-action {
   margin: 50px 500px
-}
-
-// Loader
-.lds-facebook {
-  display: inline-block;
-  position: relative;
-  width: 80px;
-  height: 80px;
-}
-
-.lds-facebook div {
-  display: inline-block;
-  position: absolute;
-  left: 8px;
-  width: 16px;
-  background: #dfc;
-  animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
-}
-
-.lds-facebook div:nth-child(1) {
-  left: 8px;
-  animation-delay: -0.24s;
-}
-
-.lds-facebook div:nth-child(2) {
-  left: 32px;
-  animation-delay: -0.12s;
-}
-
-.lds-facebook div:nth-child(3) {
-  left: 56px;
-  animation-delay: 0;
-}
-
-@keyframes lds-facebook {
-  0% {
-    top: 8px;
-    height: 64px;
-  }
-
-  50%,
-  100% {
-    top: 24px;
-    height: 32px;
-  }
 }
 </style>

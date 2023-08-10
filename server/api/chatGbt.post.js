@@ -2,18 +2,21 @@
 
 import { getChat } from "../utils/ai";
 
-function extractColorData(jsonMessage) {
-  return JSON.parse(message)
-}
-
 //messages: [{ "role": "user", "content": "Who won the world series in 2020?" },],
 export default defineEventHandler(async (event) => {
 
   const body = await readBody(event)
 
-  const prompt = `Given an image with dominant color ${body.dominant} and the following color properties ${body.colorProperties}, recommend the best text colors, background colors, border colors, and shadow colors that are not present in the color properties.
-  Ensure that each recommended color is not repeated in the input color properties, and include accessibility ratios.
-  Give repsonse in JSON with camelCase`
+  const prompt = `Given an image with dominant color ${body.dominant}
+  and the following color properties ${body.colorProperties},
+  recommend at least 10 text colors, background colors, border colors,
+  and shadow colors that is not present in the color properties.
+  Ensure that each recommended color is not repeated in the input color properties,
+  and include if it meets accessibility ratio as.
+
+  Give repsonse in JSON with color groups textColors, backgroundColors, borderColors, shadowColors.
+  Each group entry has a "color" property and an "accessible" property
+`
 
   const messages = [{ "role": "user", "content": prompt }]
 
