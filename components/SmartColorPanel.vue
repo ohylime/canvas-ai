@@ -117,6 +117,7 @@
 
 <script setup>
 
+
 const imageSrc = ref("https://images.unsplash.com/photo-1464820453369-31d2c0b651af?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y29sb3JmdWx8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=700&q=60");
 const inputValue = ref('')
 const colorProperties = ref('')
@@ -128,6 +129,7 @@ const shadowColors = ref('')
 const loading = ref(false)
 const imgErr = ref(false)
 const isAssesible = ref('')
+const answer = ref('');
 
 const resetValues = () => {
   colorProperties.value = ''
@@ -163,23 +165,36 @@ const getColorProperties = async () => {
 
 const getGbtRecommendations = async () => {
   loading.value = true
+
   try {
-    const { data } = await useFetch('/api/chatGbt',
-      {
-        method: 'post',
-        body: { dominant: dominantColor, colorProperties: colorProperties }
-      })
+    const { body } = await fetch("/api/chatGbt", {
+      method: "POST",
+      body: { dominant: dominantColor, colorProperties: colorProperties },
+    });
 
-    console.log(data)
-    loading.value = false
-    textColors.value = data.value.textColors;
-    bgColors.value = data.value.backgroundColors
-    borderColors.value = data.value.borderColors
-    shadowColors.value = data.value.shadowColors
-  } catch (e) {
-    console.log('Error', e)
+    if (!body) throw new Error("Unknown error");
+    useChatStream({
+      stream: body,
+      onChunk: ({ data }) => {
+        answer.value += data;
+      },
+      onReady: () => {
+        const json = JSON.parse(answer.value)
+
+        loading.value = false
+        textColors.value = json.textColors;
+        bgColors.value = json.backgroundColors
+        borderColors.value = json.borderColors
+        shadowColors.value = json.shadowColors
+        answer.value = ''
+      },
+    });
+
+
   }
-
+  catch (e) {
+    console.log('Error', e)
+  };
 
 
 }

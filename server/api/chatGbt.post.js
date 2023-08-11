@@ -20,12 +20,14 @@ export default defineEventHandler(async (event) => {
 
   const messages = [{ "role": "user", "content": prompt }]
 
-  let response;
+  let stream;
   try {
-    response = await getChat({ messages });
+    stream = await getChat({ messages });
 
-    const data = JSON.parse(response)
-    return data;
+    return sendStream(event, stream);
+
+    // // const data = JSON.parse(response)
+    // return data;
   } catch (e) {
     throw new Error(`Error in gbtRoute: ${e}`)
   }

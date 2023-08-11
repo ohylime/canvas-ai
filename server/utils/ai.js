@@ -35,7 +35,9 @@ export const getChat = async ({ messages }) => {
         model: "gpt-3.5-turbo",
         temperature: 0.7,
         messages,
+        stream: true
       },
+      { responseType: "stream" }
     );
 
 
@@ -46,5 +48,5 @@ export const getChat = async ({ messages }) => {
   if (!response.data) {
     throw new Error('response is error')
   }
-  return response.data.choices[0].message?.content;
+  return response.data;
 };
