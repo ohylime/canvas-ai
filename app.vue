@@ -6,8 +6,8 @@
 
 <style scoped lang="scss">
 .body {
-  display: flex;
   height: 100vh;
+  width: 100vw;
   margin: auto;
 }
 </style>

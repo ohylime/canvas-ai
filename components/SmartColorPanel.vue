@@ -1,9 +1,9 @@
 <template>
   <div class="smart-color">
     <div class="container">
-      <v-card class="section">
+      <v-card class="section rounded-xl" variant="outlined">
         <v-card-item>
-          <v-img width="300" height="300" :src="(imageSrc.length) ? imageSrc : 'error'">
+          <v-img class='image' :src="(imageSrc.length) ? imageSrc : 'error'">
             <template v-slot:error>
               <div>Error Loading Image, Try Again</div>
               <v-img class="mx-auto" height="300" width="500"
@@ -17,12 +17,12 @@
           <v-text-field variant="outlined" density="compact" hide-details :error="imgErr" v-model="inputValue" clearable
             label="Image Url" />
 
-          <v-btn class="ml-2" variant="outlined" density="compact" @click="updateSource">use image</v-btn>
+          <v-btn class="ml-2" variant="outlined" density="compact" @click="updateSource">Import</v-btn>
         </v-card-actions>
         <a target="_blank" href="https://unsplash.com/s/photos/random"> Click Here for Photos to Test</a>
       </v-card>
 
-      <v-card class="section" v-if="colorProperties" title="Color Properties">
+      <v-card class="section rounded-xl" variant="outlined" v-if="colorProperties" title="Color Properties">
         <div v-if="dominantColor" class="dominant">
           <h5> Dominant <br /> {{ dominantColor }} </h5>
           <div v-bind:style="{ 'background-color': dominantColor }" class=" color-display" />
@@ -39,8 +39,8 @@
         </div>
       </v-card>
 
-      <v-card class="section" v-if="textColors && bgColors && borderColors || loading" :loading="loading"
-        title="Recommendations">
+      <v-card class="section rounded-xl" variant="outlined" v-if="textColors && bgColors && borderColors || loading"
+        :loading="loading" title="Recommendations">
         <v-card-item v-if="textColors && bgColors && borderColors || loading" :loading="loading">
           <v-card-item>
             <h5>Text Recommendations</h5>
@@ -108,6 +108,7 @@
           + `${isAssesible}`.slice(1) }}</h5>
       </v-card>
     </div>
+    <pre class='ai-window rounded-xl' v-if="answer">{{ answer }}</pre>
     <v-btn variant="outlined" class="generate-action" :disabled="!imageSrc.length" @click="getColorProperties">Generate
       Recommendations</v-btn>
   </div>
@@ -200,28 +201,34 @@ onMounted(() => {
 .smart-color {
   display: flex;
   flex-direction: column;
-  margin: auto;
+  margin-top: 50px;
+
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
 }
 
 .container {
   display: grid;
+  grid-gap: 24px;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: auto;
+
+  padding: 24px;
 }
 
 .section {
-  border: 1px solid black;
-  margin: auto;
   padding: 16px;
-  min-width: 300px;
-  min-height: 400px;
   overflow: hidden !important;
   text-align: center;
+  max-width: 450px;
+  width: 100%;
 }
 
 .image {
-  height: 25em;
-  width: 25em;
+  height: 20rem;
+  width: 20rem;
 }
 
 .color-bars {
@@ -231,7 +238,7 @@ onMounted(() => {
   border: solid black 0.5px;
 
   div {
-    width: 2em;
+    width: 2rem;
   }
 }
 
@@ -269,7 +276,54 @@ onMounted(() => {
   align-items: center;
 }
 
+.ai-window {
+  display: flex;
+  flex-direction: column-reverse;
+  border-radius: 15px;
+
+  max-height: 150px;
+  width: 50vw;
+
+  background-color: black;
+  color: white;
+  padding: 5px;
+  margin: 24px;
+  overflow: auto;
+}
+
 .generate-action {
-  margin: 50px 500px
+  margin: 24px;
+}
+
+@media screen and (max-width: 1024px) {
+
+  .smart-color {
+    display: flex;
+    flex-direction: column;
+
+    justify-content: space-evenly;
+    align-items: center;
+    height: fit-content;
+    width: 100%;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+  }
+
+  .section {
+    padding: 16px;
+    max-width: 300px;
+    height: 100%;
+    overflow: hidden !important;
+    text-align: center;
+  }
+
+  ai-window {
+    width: 80vw;
+  }
+
 }
 </style>
