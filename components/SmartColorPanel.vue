@@ -159,6 +159,8 @@ const getColorProperties = async () => {
     method: 'post',
     body: { img: imageSrc }
   })
+
+  answer.value = ''
   colorProperties.value = data.value.colors.map((value) => rgbToHex(value[0], value[1], value[2]))
   dominantColor.value = rgbToHex(data.value.dominant[0], data.value.dominant[1], data.value.dominant[2])
 }
@@ -186,7 +188,6 @@ const getGbtRecommendations = async () => {
         bgColors.value = json.backgroundColors
         borderColors.value = json.borderColors
         shadowColors.value = json.shadowColors
-        answer.value = ''
       },
     });
 

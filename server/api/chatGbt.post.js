@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
 
   const prompt = `Given an image with dominant color ${body.dominant}
   and the following color properties ${body.colorProperties},
-  recommend at least 10 text colors, background colors, border colors,
+  recommend at least 3 text colors, background colors, border colors,
   and shadow colors that is not present in the color properties.
   Ensure that each recommended color is not repeated in the input color properties,
   and include if it meets accessibility ratio as.
